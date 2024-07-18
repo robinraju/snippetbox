@@ -14,6 +14,15 @@ CREATE TABLE snippets
     expires DATETIME     NOT NULL
 );
 
+CREATE TABLE sessions
+(
+    token  CHAR(43) PRIMARY KEY,
+    data   BLOB         NOT NULL,
+    expiry TIMESTAMP(6) NOT NULL
+);
+
+CREATE INDEX sessions_expiry_idx ON sessions (expiry);
+
 -- Add an index on the created column.
 CREATE INDEX idx_snippets_created ON snippets (created);
 
@@ -40,3 +49,5 @@ VALUES ('First autumn morning',
 CREATE USER 'web'@'%' IDENTIFIED BY 'snippetbox';
 GRANT SELECT, INSERT, UPDATE, DELETE ON snippetbox.* TO 'web'@'%';
 FLUSH PRIVILEGES;
+
+
