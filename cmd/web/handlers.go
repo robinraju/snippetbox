@@ -92,3 +92,75 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
+
+type UserSignupForm struct {
+	Name                string `schema:"name"`
+	Email               string `schema:"email"`
+	Password            string `schema:"password"`
+	validator.Validator `schema:"-"`
+}
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = UserSignupForm{}
+
+	app.render(w, r, http.StatusOK, "signup.go.html", data)
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var form UserSignupForm
+	err := app.formDecoder.Decode(&form, r.PostForm)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// Validate the form contents using our helper functions.
+	form.CheckField(validator.NotBlank(form.Name), "name", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "signup.go.html", data)
+		return
+	}
+
+	err = app.users.Insert(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			form.AddFieldError("email", "Email address is already in use")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusUnprocessableEntity, "signup.go.html", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Your signup was successful. Please log in.")
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Display a form for logging in a user...")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate and login the user...")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Logout the user...")
+}
