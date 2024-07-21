@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"github.com/alexedwards/scs/mysqlstore"
@@ -16,11 +17,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type config struct {
-	addr      string
-	staticDir string
-}
-
 type application struct {
 	logger         *slog.Logger
 	snippets       *models.SnippetModel
@@ -31,10 +27,7 @@ type application struct {
 
 func main() {
 
-	var cfg config
-
-	flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
-	flag.StringVar(&cfg.staticDir, "static-dir", "./ui/static/", "Path to static assets")
+	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "web:snippetbox@tcp(localhost:3306)/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
@@ -69,14 +62,27 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
-	logger.Info("starting server", "addr", cfg.addr)
-
-	err = http.ListenAndServe(cfg.addr, app.routes())
-
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+		MinVersion:       tls.VersionTLS10,
+		MaxVersion:       tls.VersionTLS12,
 	}
+
+	srv := &http.Server{
+		Addr:         *addr,
+		Handler:      app.routes(),
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	logger.Info("starting server", "addr", srv.Addr)
+
+	err = srv.ListenAndServeTLS("./tls/localhost.pem", "./tls/localhost-key.pem")
+	logger.Error(err.Error())
+	os.Exit(1)
 }
 
 func openDB(dsn string) (*sql.DB, error) {
