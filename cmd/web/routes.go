@@ -11,13 +11,14 @@ func (app *application) routes() http.Handler {
 
 	//fileServer := http.FileServer(http.Dir("./ui/static/"))
 	fileServer := http.FileServerFS(ui.Files)
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("GET /static/", fileServer)
 
 	mux.HandleFunc("GET /ping", ping)
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave, app.authenticate)
 
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
+	mux.Handle("GET /about", dynamic.ThenFunc(app.about))
 	mux.Handle("GET /snippet/view/{id}", dynamic.ThenFunc(app.snippetView))
 	mux.Handle("GET /user/signup", dynamic.ThenFunc(app.userSignup))
 	mux.Handle("POST /user/signup", dynamic.ThenFunc(app.userSignupPost))
