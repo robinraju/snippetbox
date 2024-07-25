@@ -10,8 +10,7 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	//fileServer := http.FileServer(http.Dir("./ui/static/"))
-	fileServer := http.FileServerFS(ui.Files)
-	mux.Handle("GET /static/", fileServer)
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	mux.HandleFunc("GET /ping", ping)
 
@@ -30,9 +29,8 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /snippet/create", protected.ThenFunc(app.snippetCreate))
 	mux.Handle("POST /snippet/create", protected.ThenFunc(app.snippetCreatePost))
 	mux.Handle("POST /user/logout", protected.ThenFunc(app.userLogoutPost))
+	mux.Handle("GET /account/view", protected.ThenFunc(app.accountView))
 
-	// Create a middleware chain
 	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
-
 	return standard.Then(mux)
 }
