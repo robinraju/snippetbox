@@ -1,9 +1,10 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/justinas/alice"
 	"github.com/robinraju/snippetbox/ui"
-	"net/http"
 )
 
 func (app *application) routes() http.Handler {

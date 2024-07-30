@@ -1,9 +1,10 @@
 package mocks
 
 import (
-	"github.com/robinraju/snippetbox/internal/models"
 	"strconv"
 	"time"
+
+	"github.com/robinraju/snippetbox/internal/models"
 )
 
 type UserModel struct{}

@@ -2,11 +2,12 @@ package main
 
 import (
 	"bytes"
-	"github.com/robinraju/snippetbox/internal/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/robinraju/snippetbox/internal/assert"
 )
 
 func TestCommonHeaders(t *testing.T) {

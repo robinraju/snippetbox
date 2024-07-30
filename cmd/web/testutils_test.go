@@ -2,15 +2,16 @@ package main
 
 import (
 	"bytes"
-	"github.com/alexedwards/scs/v2"
-	"github.com/gorilla/schema"
-	"github.com/robinraju/snippetbox/internal/models/mocks"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/alexedwards/scs/v2"
+	"github.com/gorilla/schema"
+	"github.com/robinraju/snippetbox/internal/models/mocks"
 )
 
 func newTestApplication(t *testing.T) *application {

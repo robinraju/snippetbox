@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/gorilla/schema"
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/gorilla/schema"
 )
 
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {
