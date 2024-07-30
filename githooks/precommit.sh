@@ -20,7 +20,6 @@ else
     echo "\n\tgo get golang.org/x/tools/cmd/goimports\n"
     exit 1
 fi
-
-make test' >${GIT_HOOKS_PATH}/pre-commit
+' >${GIT_HOOKS_PATH}/pre-commit
 
 chmod +x ${GIT_HOOKS_PATH}/pre-commit

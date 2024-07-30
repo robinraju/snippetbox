@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/robinraju/snippetbox/internal/models"
-	"github.com/robinraju/snippetbox/internal/validator"
 	"net/http"
 	"strconv"
+
+	"github.com/robinraju/snippetbox/internal/models"
+	"github.com/robinraju/snippetbox/internal/validator"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {

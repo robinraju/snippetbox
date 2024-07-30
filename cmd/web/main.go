@@ -4,15 +4,16 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"flag"
-	"github.com/alexedwards/scs/mysqlstore"
-	"github.com/alexedwards/scs/v2"
-	"github.com/gorilla/schema"
-	"github.com/robinraju/snippetbox/internal/models"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
+	"github.com/gorilla/schema"
+	"github.com/robinraju/snippetbox/internal/models"
 
 	_ "github.com/go-sql-driver/mysql"
 )
